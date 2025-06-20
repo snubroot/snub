@@ -124,6 +124,8 @@ For containerized deployment:
 - 👪 **Family System** - Create virtual families with adoption, marriage, and family relationships
 - 🏗️ **AI Server Builder** - Create complete server structures in seconds with AI-generated templates customized to your needs
 - 💸 **Currency Converter & Crypto Tracker** - Convert between currencies and track cryptocurrency prices
+- 😂 **Dad Jokes** - Get random dad jokes or search for jokes by keyword
+- 🧠 **DeepAI Integration** - Access various AI models for text generation, image manipulation, and analysis
 
 ### Server Management
 - 📌 **Sticky Messages** - Pin important messages that reappear after new activity
@@ -153,6 +155,18 @@ For containerized deployment:
 | `/date_fact <month> <day>` | Get a fact about a specific date | Everyone |
 | `/year_fact <year>` | Get a fact about a specific year | Everyone |
 | `!number [number] [category]` | Get a fact about a number (hybrid command) | Everyone |
+</details>
+
+<details>
+<summary>😂 Dad Jokes Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!dadjoke` | Get a random dad joke | Everyone |
+| `/random_dad_joke` | Get a random dad joke (slash command) | Everyone |
+| `!searchdadjoke <term> [limit]` | Search for dad jokes containing a term | Everyone |
+| `/search_dad_jokes <term> [limit]` | Search for dad jokes (slash command) | Everyone |
+| `!dadjoke_help` | Show help for dad joke commands | Everyone |
 </details>
 
 <details>
@@ -237,6 +251,25 @@ For containerized deployment:
 </details>
 
 <details>
+<summary>🧠 DeepAI Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!deepai help` or `!dai help` | Show help for DeepAI commands | Everyone |
+| **Text Generation** |  |  |
+| `!dai text-generator <prompt>` | Generate text from a prompt | Everyone |
+| `!dai chatbot <message>` | Chat with an AI assistant | Everyone |
+| **Image Generation & Manipulation** |  |  |
+| `!dai dream <prompt>` | Generate an image from text | Everyone |
+| `!dai colorize <image_url>` | Colorize a black and white image | Everyone |
+| `!dai toonify <image_url>` | Convert a photo to a cartoon | Everyone |
+| `!dai enhance <image_url>` | Enhance image resolution | Everyone |
+| **Analysis** |  |  |
+| `!dai sentiment <text>` | Analyze text sentiment | Everyone |
+| `!dai summarize <text>` | Summarize long text | Everyone |
+</details>
+
+<details>
 <summary>🧠 Mental Health Commands</summary>
 
 | Command | Description | Permission |
@@ -291,7 +324,9 @@ For containerized deployment:
     ├── server_builder.py  # AI server builder
     ├── currency.py        # Currency converter & crypto tracker
     ├── news.py            # Real-time news fetcher
-    └── mentalhealth.py    # Mental health check-in system
+    ├── mentalhealth.py    # Mental health check-in system
+    ├── dadjokes.py        # Dad jokes integration
+    └── deepai.py          # DeepAI models integration
 ```
 
 ## 🏗️ AI Server Builder
