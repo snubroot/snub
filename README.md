@@ -125,6 +125,8 @@ For containerized deployment:
 - 🏗️ **AI Server Builder** - Create complete server structures in seconds with AI-generated templates customized to your needs
 - 💸 **Currency Converter & Crypto Tracker** - Convert between currencies and track cryptocurrency prices
 - 😂 **Dad Jokes** - Get random dad jokes or search for jokes by keyword
+- 🥠 **Fortune Cookies** - Receive mystical fortune cookie messages with different personality modes
+- 🖼️ **Reddit Memes** - Browse memes from Reddit with category filtering and auto-posting
 - 📚 **Wikipedia Integration** - Search Wikipedia for articles, summaries, and links
 - 🧠 **DeepAI Integration** - Access various AI models for text generation, image manipulation, and analysis
 
@@ -301,6 +303,33 @@ For containerized deployment:
 </details>
 
 <details>
+<summary>🥠 Fortune Cookie Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!fortune` | Get a mystical fortune cookie message | Everyone |
+| `!fortune wholesome` | Get a positive, uplifting fortune | Everyone |
+| `!fortune cryptic` | Get an enigmatic, puzzling fortune | Everyone |
+| `!fortune dark` | Get a slightly ominous fortune with dark humor | Everyone |
+| `!fortune cursed` | Get a deeply unsettling fortune | Everyone |
+</details>
+
+<details>
+<summary>🖼️ Reddit Meme Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!meme` | Get a random meme from Reddit | Everyone |
+| `!meme <1-5>` | Get multiple random memes (1-5) | Everyone |
+| `!meme <category>` | Get a meme from a specific category | Everyone |
+| `!meme <category> <1-5>` | Get multiple memes from a specific category | Everyone |
+| `!automeme` | Start posting random memes every 30 minutes | Manage Messages |
+| `!automeme <category>` | Start posting memes from a category every 30 minutes | Manage Messages |
+| `!automeme <category> <interval>` | Start posting memes at specified interval (minutes) | Manage Messages |
+| `!automeme stop` | Stop automatic meme posting in the channel | Manage Messages |
+</details>
+
+<details>
 <summary>📚 Wikipedia Commands</summary>
 
 | Command | Description | Permission |
@@ -353,7 +382,9 @@ For containerized deployment:
     ├── dadjokes.py        # Dad jokes integration
     ├── deepai.py          # DeepAI models integration
     ├── welcome.py         # Welcome message system
-    └── wikipedia.py       # Wikipedia integration
+    ├── wikipedia.py       # Wikipedia integration
+    ├── fortune.py         # Fortune cookie generator
+    └── meme.py            # Reddit meme fetcher
 ```
 
 ## 🏗️ AI Server Builder
