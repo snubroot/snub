@@ -125,11 +125,13 @@ For containerized deployment:
 - 🏗️ **AI Server Builder** - Create complete server structures in seconds with AI-generated templates customized to your needs
 - 💸 **Currency Converter & Crypto Tracker** - Convert between currencies and track cryptocurrency prices
 - 😂 **Dad Jokes** - Get random dad jokes or search for jokes by keyword
+- 📚 **Wikipedia Integration** - Search Wikipedia for articles, summaries, and links
 - 🧠 **DeepAI Integration** - Access various AI models for text generation, image manipulation, and analysis
 
 ### Server Management
 - 📌 **Sticky Messages** - Pin important messages that reappear after new activity
 - 🔍 **Slash Commands** - Modern Discord slash command support
+- 👋 **Welcome Messages** - Beautiful embed-based welcome messages for new members
 
 ## 🔧 Commands
 
@@ -227,6 +229,17 @@ For containerized deployment:
 </details>
 
 <details>
+<summary>👋 Welcome Messages</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!enablewelcome` | Enable welcome messages in the current channel | Administrator |
+| `!setwelcome <channel_id>` | Set the channel for welcome messages | Administrator |
+| `!testwelcome` | Test the welcome message | Administrator |
+| `!disablewelcome` | Disable welcome messages | Administrator |
+</details>
+
+<details>
 <summary>🎂 Birthday Commands</summary>
 
 | Command | Description | Permission |
@@ -287,6 +300,18 @@ For containerized deployment:
 | `!deletelog` | Delete all your mood history (requires confirmation) | Everyone |
 </details>
 
+<details>
+<summary>📚 Wikipedia Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!wiki <query>` | Search Wikipedia and get a summary | Everyone |
+| `/wikipedia <query>` | Search Wikipedia (slash command) | Everyone |
+| `!wikilinks <title>` | Get links from a Wikipedia article | Everyone |
+| `!randomwiki` | Get a random Wikipedia article | Everyone |
+| `/random_wikipedia` | Get a random article (slash command) | Everyone |
+</details>
+
 ## 📁 Project Structure
 
 ```
@@ -326,7 +351,9 @@ For containerized deployment:
     ├── news.py            # Real-time news fetcher
     ├── mentalhealth.py    # Mental health check-in system
     ├── dadjokes.py        # Dad jokes integration
-    └── deepai.py          # DeepAI models integration
+    ├── deepai.py          # DeepAI models integration
+    ├── welcome.py         # Welcome message system
+    └── wikipedia.py       # Wikipedia integration
 ```
 
 ## 🏗️ AI Server Builder
@@ -429,4 +456,4 @@ Contributions are welcome! Here's how you can help:
 ## 📝 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-# snub
+

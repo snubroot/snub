@@ -7,6 +7,7 @@ import json
 import os
 import aiohttp
 from dotenv import load_dotenv
+from utils import webhook_embeds
 
 class TicketModal(ui.Modal, title="Create a Support Ticket"):
     issue = ui.TextInput(
@@ -109,12 +110,9 @@ class Tickets(commands.Cog):
             if TICKET_WEBHOOK:
                 try:
                     webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
-                    await webhook.send(
-                        f"🎫 **New Ticket Created**\n" \
-                        f"**User:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**Ticket:** {channel.mention}\n" \
-                        f"**Issue:** {issue[:1000]}" # Truncate if too long
-                    )
+                    issue_text = issue[:1000] if len(issue) > 1000 else issue
+                    webhook_embed = webhook_embeds.create_ticket_webhook_embed(interaction, channel, ticket_number, ticket_id, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
             
@@ -231,12 +229,9 @@ class Tickets(commands.Cog):
             if TICKET_WEBHOOK:
                 try:
                     webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
-                    await webhook.send(
-                        f"🎫 **New Ticket Created**\n" \
-                        f"**User:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**Ticket:** {channel.mention}\n" \
-                        f"**Issue:** {issue[:1000]}" # Truncate if too long
-                    )
+                    issue_text = issue[:1000] if len(issue) > 1000 else issue
+                    webhook_embed = webhook_embeds.create_ticket_webhook_embed(interaction, channel, ticket_number, ticket_id, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
         
@@ -345,13 +340,16 @@ class Tickets(commands.Cog):
                 try:
                     webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
                     issue_text = ticket['issue'][:500] + "..." if len(ticket['issue']) > 500 else ticket['issue']
-                    await webhook.send(
-                        f"🔒 **Ticket Closed**\n" \
-                        f"**Ticket:** {channel.mention} (#{ticket_id.split('-')[1]})\n" \
-                        f"**Closed by:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**User:** <@{ticket['user_id']}>\n" \
-                        f"**Issue:** {issue_text}"
-                    )
+                    
+                    # Get the user who created the ticket
+                    ticket_user = interaction.guild.get_member(int(ticket['user_id']))
+                    user_mention = f"<@{ticket['user_id']}>"
+                    user_name = "Unknown User"
+                    if ticket_creator:
+                        user_name = str(ticket_creator)
+                    
+                    webhook_embed = webhook_embeds.close_ticket_webhook_embed(interaction, channel, ticket_id, ticket, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
         
@@ -395,13 +393,8 @@ class Tickets(commands.Cog):
                     channel_mention = channel.mention if channel else f"#deleted-channel"
                     issue_text = ticket['issue'][:500] + "..." if len(ticket['issue']) > 500 else ticket['issue']
                     
-                    await webhook.send(
-                        f"👤 **Ticket Claimed**\n" \
-                        f"**Ticket:** {channel_mention} (#{ticket_id.split('-')[1]})\n" \
-                        f"**Claimed by:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**User:** <@{ticket['user_id']}>\n" \
-                        f"**Issue:** {issue_text}"
-                    )
+                    webhook_embed = webhook_embeds.claim_ticket_webhook_embed(interaction, channel_mention, ticket_id, ticket, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
             
@@ -433,13 +426,8 @@ class Tickets(commands.Cog):
                 try:
                     webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
                     issue_text = ticket['issue'][:500] + "..." if len(ticket['issue']) > 500 else ticket['issue']
-                    await webhook.send(
-                        f"🗑️ **Ticket Deleted**\n" \
-                        f"**Ticket:** #{ticket_id.split('-')[1]}\n" \
-                        f"**Deleted by:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**User:** <@{ticket['user_id']}>\n" \
-                        f"**Issue:** {issue_text}"
-                    )
+                    webhook_embed = webhook_embeds.delete_ticket_webhook_embed(interaction, ticket_id, ticket, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
             
@@ -507,13 +495,8 @@ class Tickets(commands.Cog):
                 try:
                     webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
                     issue_text = ticket['issue'][:500] + "..." if len(ticket['issue']) > 500 else ticket['issue']
-                    await webhook.send(
-                        f"🔓 **Ticket Reopened**\n" \
-                        f"**Ticket:** {channel.mention} (#{ticket_id.split('-')[1]})\n" \
-                        f"**Reopened by:** {interaction.user.mention} ({interaction.user})\n" \
-                        f"**User:** <@{ticket['user_id']}>\n" \
-                        f"**Issue:** {issue_text}"
-                    )
+                    webhook_embed = webhook_embeds.reopen_ticket_webhook_embed(interaction, channel, ticket_id, ticket, issue_text)
+                    await webhook.send(embed=webhook_embed)
                 except Exception as webhook_error:
                     print(f"Error sending webhook notification: {webhook_error}")
             
@@ -569,40 +552,54 @@ class Tickets(commands.Cog):
     async def setup_tickets(self, interaction: discord.Interaction):
         """Set up the ticket system"""
         try:
+            # First check if webhook is configured
             if not TICKET_WEBHOOK:
                 await interaction.response.send_message(
                     "⚠️ Ticket webhook is not configured. Please add a TICKET_WEBHOOK to your .env file.", 
                     ephemeral=True
                 )
                 return
+            
+            # Defer the response immediately to prevent interaction timeout
+            await interaction.response.defer(ephemeral=True)
                 
             try:
                 webhook = discord.Webhook.from_url(TICKET_WEBHOOK, session=self.bot.session)
-                test_msg = await webhook.send("Webhook test - setting up ticket system", wait=True)
+                test_embed = discord.Embed(
+                    title="🔄 Webhook Test",
+                    description="Setting up ticket system - testing webhook connection",
+                    color=discord.Color.blue(),
+                    timestamp=datetime.datetime.now()
+                )
+                test_msg = await webhook.send(embed=test_embed, wait=True)
                 await test_msg.delete()
             except discord.NotFound:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     "⚠️ The configured webhook URL is invalid or the webhook has been deleted. Please update your TICKET_WEBHOOK in the .env file.",
                     ephemeral=True
                 )
                 return
             except Exception as webhook_error:
-                await interaction.response.send_message(
+                await interaction.followup.send(
                     f"⚠️ Error validating webhook: {webhook_error}. Please check your TICKET_WEBHOOK configuration.",
                     ephemeral=True
                 )
                 return
                 
+            # Check for existing tickets category
             category = None
             for c in interaction.guild.categories:
                 if c.name.lower() == "tickets":
                     category = c
                     break
                     
+            # Create category if needed
+            category_created = False
             if not category:
                 category = await interaction.guild.create_category("Tickets")
-                await interaction.followup.send(f"Created category {category.mention}")
+                category_created = True
             
+            # Create the embed for ticket creation
             embed = discord.Embed(
                 title="🎫 Support Tickets",
                 description="Need help? Click the button below to create a support ticket.",
@@ -617,19 +614,62 @@ class Tickets(commands.Cog):
             
             embed.set_footer(text=f"Support Ticket System", icon_url=interaction.guild.icon.url if interaction.guild.icon else None)
             
+            # Create the ticket button
             create_button = discord.ui.Button(style=discord.ButtonStyle.primary, label="Create Ticket", emoji="🎫", custom_id="create_ticket")
             
             view = discord.ui.View()
             view.add_item(create_button)
             
-            await interaction.response.send_message("Setting up the ticket system...", ephemeral=True)
-            await interaction.channel.send(embed=embed, view=view)
+            # Send the ticket creation message
+            ticket_msg = await interaction.channel.send(embed=embed, view=view)
             
-            await webhook.send(f"✅ Ticket system has been set up in {interaction.channel.mention} by {interaction.user.mention}")
+            # Send status message to webhook
+            # Create a stylish embed for the setup notification
+            webhook_embed = discord.Embed(
+                title="✅ Ticket System Setup",
+                description=f"The ticket system has been successfully set up by {interaction.user.mention}.",
+                color=0x2ecc71,  # Green color
+                timestamp=datetime.datetime.now()
+            )
+            
+            webhook_embed.add_field(
+                name="Channel",
+                value=interaction.channel.mention,
+                inline=True
+            )
+            webhook_embed.add_field(
+                name="Setup by",
+                value=f"{interaction.user.mention} ({interaction.user})",
+                inline=True
+            )
+            
+            # Add server icon if available
+            if interaction.guild.icon:
+                webhook_embed.set_thumbnail(url=interaction.guild.icon.url)
+                
+            await webhook.send(embed=webhook_embed)
+            
+            # Send final response to user
+            response_text = "✅ Ticket system has been set up successfully!"
+            if category_created:
+                response_text += f"\n• Created category {category.name}"
+            response_text += f"\n• Created ticket message with button"
+            
+            await interaction.followup.send(response_text, ephemeral=True)
             
         except Exception as e:
             print(f"Error setting up tickets: {e}")
-            await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
+            try:
+                # Try to send followup if we've already deferred
+                await interaction.followup.send(f"An error occurred: {e}", ephemeral=True)
+            except:
+                # If that fails, try to send a response
+                try:
+                    await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
+                except:
+                    # If all else fails, just print to console
+                    print(f"Could not send error message to user: {e}")
+
 
 async def setup(bot):
     await bot.add_cog(Tickets(bot))

@@ -214,7 +214,9 @@ class HelpCommand(commands.Cog):
                 cog_mapping[cog_name] = []
         
         bot_name = self.bot.user.name
-        embed = self.create_help_embed(
+        
+        # Create main embed with introduction and statistics
+        main_embed = self.create_help_embed(
             f"📚 {bot_name} Help Menu",
             f"Welcome to the **{bot_name}** help system! Below you'll find all available commands grouped by category.\n\n"
             f"**🔹 Usage Tips:**\n"
@@ -227,7 +229,7 @@ class HelpCommand(commands.Cog):
         total_app_commands = sum(len(cmds) for cmds in app_command_mapping.values())
         total_categories = len(cog_mapping)
         
-        embed.add_field(
+        main_embed.add_field(
             name="📊 Bot Statistics",
             value=f"• **{total_prefix_commands}** commands available\n"
                   f"• **{total_app_commands}** slash commands available\n"
@@ -236,10 +238,29 @@ class HelpCommand(commands.Cog):
             inline=False
         )
         
-        for cog_name, commands_list in sorted(cog_mapping.items()):
+        # Discord has a limit of 25 fields per embed
+        # We'll create multiple embeds if needed
+        embeds = [main_embed]
+        current_embed = main_embed
+        field_count = 1  # Start with 1 for the statistics field
+        
+        # Sort categories alphabetically
+        sorted_categories = sorted(cog_mapping.items())
+        
+        for cog_name, commands_list in sorted_categories:
             if not commands_list and cog_name not in app_command_mapping:
                 continue
                 
+            # Check if we need a new embed (leaving room for the tip field at the end)
+            if field_count >= 24:  # Max 25 fields, but save one for the tip
+                # Create a new embed for the next set of categories
+                current_embed = self.create_help_embed(
+                    f"📚 {bot_name} Help Menu (Continued)",
+                    f"Additional command categories for **{bot_name}**."
+                )
+                embeds.append(current_embed)
+                field_count = 0
+            
             cog = self.bot.get_cog(cog_name)
             description = cog.description if cog and cog.description else "No description"
             
@@ -254,27 +275,51 @@ class HelpCommand(commands.Cog):
             has_slash = cog_name in app_command_mapping and len(app_command_mapping[cog_name]) > 0
             slash_indicator = " + 🔍" if has_slash else ""
             
-            embed.add_field(
+            current_embed.add_field(
                 name=f"{emoji} {cog_name} ({len(commands_list)}{slash_indicator})",
                 value=f"*{description}*\n{formatted_commands}",
                 inline=False
             )
+            field_count += 1
         
+        # Add slash commands info to the last embed
         total_slash = sum(len(cmds) for cmds in app_command_mapping.values())
         if total_slash > 0:
-            embed.add_field(
+            if field_count >= 24:  # Need a new embed
+                current_embed = self.create_help_embed(
+                    f"📚 {bot_name} Help Menu (Continued)",
+                    f"Additional information for **{bot_name}**."
+                )
+                embeds.append(current_embed)
+                field_count = 0
+                
+            current_embed.add_field(
                 name="🔍 Slash Commands",
                 value=f"This bot has **{total_slash}** slash commands. Type `/` in Discord to see them or use `!help slash` for details.",
                 inline=False
             )
+            field_count += 1
         
-        embed.add_field(
+        # Add tip to the last embed
+        if field_count >= 24:  # Need a new embed
+            current_embed = self.create_help_embed(
+                f"📚 {bot_name} Help Menu (Continued)",
+                f"Additional information for **{bot_name}**."
+            )
+            embeds.append(current_embed)
+        
+        current_embed.add_field(
             name="💡 Tip",
             value="Commands marked with 🔒 require special permissions to use.",
             inline=False
         )
         
-        await ctx.send(embed=embed)
+        # Send all embeds
+        for i, embed in enumerate(embeds):
+            # Add page numbers if there are multiple embeds
+            if len(embeds) > 1:
+                embed.set_footer(text=f"Page {i+1}/{len(embeds)} | {bot_name} Help System")
+            await ctx.send(embed=embed)
     
     async def send_command_help(self, ctx, command_name: str):
         """Send help for a specific command or category"""
