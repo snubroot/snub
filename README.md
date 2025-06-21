@@ -126,6 +126,8 @@ For containerized deployment:
 - 🏗️ **AI Server Builder** - Create complete server structures in seconds with AI-generated templates customized to your needs
 - 💸 **Currency Converter & Crypto Tracker** - Convert between currencies and track cryptocurrency prices
 - 😂 **Dad Jokes** - Get random dad jokes or search for jokes by keyword
+- 🔍 **Advanced User Info** - Detailed user information including account age, join date, roles, and moderation history
+- 🔗 **Link Preview** - Extract and display metadata from URLs with rich embeds
 - 🧾 **Channel Transcripts** - Generate clean, downloadable logs of channels in TXT/HTML formats
 - 🥠 **Fortune Cookies** - Receive mystical fortune cookie messages with different personality modes
 - 🖼️ **Reddit Memes** - Browse memes from Reddit with category filtering and auto-posting
@@ -194,6 +196,22 @@ For containerized deployment:
 | `!disableverify` | Disable the verification system | Admin |
 | `!setverify <channel_id>` | Set the channel for verification | Admin |
 | `!setverifyrole <@role>` | Set the role to assign upon verification | Admin |
+</details>
+
+<details>
+<summary>🔍 User Info Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!userinfo [@user]` | Display detailed user information including account age, join date, roles, warns/mutes, and invite source | Everyone |
+</details>
+
+<details>
+<summary>🔗 Link Preview Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!linkpreview <url>` | Generate a rich preview of a URL with title, image, and description | Everyone |
 </details>
 
 <details>
@@ -381,6 +399,8 @@ For containerized deployment:
 │   ├── sticky_messages.json
 │   ├── tickets.json
 │   ├── verification_config.json
+│   ├── warnings.json
+│   ├── mutes.json
 │   └── wouldurather_questions.json
 └── cogs/             # Bot command modules
     ├── help.py           # Custom help command
@@ -391,6 +411,8 @@ For containerized deployment:
     ├── reactionroles.py  # Self-assignable roles
     ├── tickets.py        # Ticket system
     ├── verification.py   # User verification system
+    ├── userinfo.py       # Advanced user information
+    ├── linkpreview.py    # URL metadata extractor
     ├── birthdays.py      # Birthday tracking
     ├── family.py         # Virtual family system
     ├── invites.py        # Invite tracking
