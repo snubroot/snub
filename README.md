@@ -109,6 +109,7 @@ For containerized deployment:
 - 🎨 **Beautiful Embeds** - All responses use rich, colorful embeds
 - 🔍 **Error Logging** - Comprehensive error tracking with Discord channel logging
 - 📰 **Real-Time News** - Fetch latest headlines by topic or keyword
+- 🌙 **Dream Journal** - Log and interpret dreams with symbol detection and analysis
 - 🧠 **Mental Health Check-In** - Private mood tracking with journaling prompts
 
 ### User Management
@@ -125,6 +126,7 @@ For containerized deployment:
 - 🏗️ **AI Server Builder** - Create complete server structures in seconds with AI-generated templates customized to your needs
 - 💸 **Currency Converter & Crypto Tracker** - Convert between currencies and track cryptocurrency prices
 - 😂 **Dad Jokes** - Get random dad jokes or search for jokes by keyword
+- 🧾 **Channel Transcripts** - Generate clean, downloadable logs of channels in TXT/HTML formats
 - 🥠 **Fortune Cookies** - Receive mystical fortune cookie messages with different personality modes
 - 🖼️ **Reddit Memes** - Browse memes from Reddit with category filtering and auto-posting
 - 📚 **Wikipedia Integration** - Search Wikipedia for articles, summaries, and links
@@ -303,6 +305,16 @@ For containerized deployment:
 </details>
 
 <details>
+<summary>🌙 Dream Journal Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!dreamlog <entry>` | Log a dream entry with automatic symbol detection | Everyone |
+| `!dreamstats` | View statistics about your dream journal | Everyone |
+| `!interpretdream <entry_id>` | Get an AI-powered interpretation of a specific dream | Everyone |
+</details>
+
+<details>
 <summary>🥠 Fortune Cookie Commands</summary>
 
 | Command | Description | Permission |
@@ -339,6 +351,17 @@ For containerized deployment:
 | `!wikilinks <title>` | Get links from a Wikipedia article | Everyone |
 | `!randomwiki` | Get a random Wikipedia article | Everyone |
 | `/random_wikipedia` | Get a random article (slash command) | Everyone |
+</details>
+
+<details>
+<summary>🧾 Transcript Commands</summary>
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `!transcript [channel] [limit] [format]` | Generate transcript from a channel | Everyone |
+| `!transcript here [limit] [format]` | Generate transcript from current channel | Everyone |
+| `!transcript #channel [limit] [format]` | Generate transcript from specific channel | Everyone |
+| `!transcript_dm @user [limit] [format]` | Generate transcript from DM conversation (DM only) | Everyone |
 </details>
 
 ## 📁 Project Structure
@@ -384,7 +407,9 @@ For containerized deployment:
     ├── welcome.py         # Welcome message system
     ├── wikipedia.py       # Wikipedia integration
     ├── fortune.py         # Fortune cookie generator
-    └── meme.py            # Reddit meme fetcher
+    ├── meme.py            # Reddit meme fetcher
+    ├── dreamjournal.py    # Dream journal and interpretation
+    └── transcript.py      # Channel transcript generator
 ```
 
 ## 🏗️ AI Server Builder
